@@ -7,7 +7,7 @@ class Ino(pygame.sprite.Sprite):
         #инициальзируем и задем начальную позицию
         super(Ino, self).__init__()
         self.screen = screen
-        self.image = pygame.image.load("space_game/Models/vrag.png")
+        self.image = pygame.image.load("Space-Wars/Models/vrag.png")
         self.rect = self.image.get_rect()
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
