@@ -2,6 +2,8 @@ import pygame
 import sys
 from bullet import Bullet
 from ino import Ino
+import time
+from pathlib import Path
 
 
 def events(screen, gun, bullets):
@@ -27,9 +29,10 @@ def events(screen, gun, bullets):
                 gun.mleft = False
 
 
-def update(bg_color, screen, gun, inos, bullets):
+def update(bg_color, screen, stats, sc, gun, inos, bullets):
     #обновление экрана
     screen.fill(bg_color)
+    sc.show_score()
     for bullet in bullets.sprites():
         bullet.draw_bullet()
     gun.output()
@@ -37,18 +40,49 @@ def update(bg_color, screen, gun, inos, bullets):
     pygame.display.flip()
 
 
-def update_bullet(inos, bullets):
+def update_bullet(screen, stats, sc, inos, bullets):
     #обновлять позиции пули
     bullets.update()
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
     collisions = pygame.sprite.groupcollide(bullets, inos, True, True)
+    if collisions:
+        for inos in collisions.values():
+            stats.score += 10 * len(inos)
+        sc.image_score()
+        check_high_score(stats, sc)
+    if len(inos) == 0:
+        bullets.empty()
+        create_army(screen, inos)
 
-def update_inos(inos):
+def gun_kill(stats, screen, gun, inos, bullets):
+    #столкновение пушки и армии
+    if stats.guns_left > 0:
+        stats.guns_left -= 1
+        inos.empty()
+        bullets.empty()
+        create_army(screen, inos)
+        gun.create_gun()
+        time.sleep(1)
+    else:
+        stats.run_game = False
+        sys.exit()
+
+def update_inos(stats,  screen, gun, inos, bullets):
     #обновляет позицию прищельцев
     inos.update()
+    if pygame.sprite.spritecollideany(gun, inos):
+        gun_kill(stats, screen, gun, inos, bullets)
+    inos_check(stats,  screen, gun, inos, bullets)
 
+def inos_check(stats,  screen, gun, inos, bullets):
+    #проверка, зашла ли армия за край экрана
+    screen_rect = screen.get_rect()
+    for ino in inos.sprites():
+        if ino.rect.bottom >= screen_rect.bottom:
+            gun_kill(stats,  screen, gun, inos, bullets)
+            break
 
 def create_army(screen, inos):
     #создание армии пришельцев
@@ -66,3 +100,14 @@ def create_army(screen, inos):
             ino.rect.x = ino.x
             ino.rect.y = ino.rect.height + (ino.rect.height * row_number)
             inos.add(ino)
+
+
+def check_high_score(stats,sc):
+    #проверка рекорда
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sc.image_high_score()
+        with open(Path('./') / 'Space-Wars' / 'highscore.txt', 'w') as f:
+            f.write(str(stats.high_score))
+
+
