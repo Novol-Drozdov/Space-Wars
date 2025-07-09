@@ -1,11 +1,12 @@
 import pygame
 from pathlib import Path
+from pygame.sprite import Sprite
 
-class Gun():
+class Gun(Sprite):
 
     def __init__(self, screen):
         #инициализация пушки
-
+        super(Gun, self).__init__()
         self.screen = screen
         self.image = pygame.image.load(Path("./") / "Space-Wars" / "Models" / "Cosmos_trasport.png")
         self.rect = self.image.get_rect()
