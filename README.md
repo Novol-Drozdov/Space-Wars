@@ -1,5 +1,5 @@
 English:
-You fly right/left, dodge the aliens' bullets and shoot at them.
+You destroy aliens, you must not let them get to you.
 
 Русский:
-Летаешь в право/лево, уворачиваешся от пуль инопланетян и стреляшь в них.
+Уничтожаешь пришельцев, должен не дать дойти до себя.
